@@ -298,6 +298,60 @@ body.quiz .controls{position:relative; z-index:auto}
 .quiz-done ol .m{display:block; font-size:.92rem; color:var(--ink-soft)}
 .quiz-done .cap{margin:18px 0 0; font-size:.86rem; color:var(--ink-faint); letter-spacing:.08em}
 
+/* ── 熟練度 ── */
+.prog{
+  grid-column:1/2; margin:6px 0 0; font-size:.78rem; color:var(--ink-faint);
+  letter-spacing:.06em; display:flex; align-items:center; gap:9px; flex-wrap:wrap;
+}
+.gauge{display:inline-flex; gap:2px}
+.gauge i{width:7px; height:7px; background:var(--rule-soft); border:1px solid var(--rule)}
+.gauge i.on{background:var(--indigo); border-color:var(--indigo)}
+
+/* ── 測驗：題型列 ── */
+.q-bar{
+  display:flex; gap:8px 18px; flex-wrap:wrap; justify-content:flex-end;
+  margin:0 0 10px; font-size:.84rem; color:var(--ink-faint); letter-spacing:.06em;
+}
+/* ── 選擇題 ── */
+.opts{display:grid; gap:8px; max-width:32ch; margin:4px auto 0}
+.opt{
+  font:inherit; font-size:1.08rem; letter-spacing:.12em; text-align:center;
+  padding:11px 12px; color:var(--ink); background:var(--surface);
+  border:1px solid var(--rule); border-radius:0; cursor:pointer;
+}
+.opt:hover{border-color:var(--indigo); color:var(--indigo)}
+.opt:focus-visible{outline:2px solid var(--indigo); outline-offset:1px}
+.opt.right{background:var(--indigo-soft); border-color:var(--indigo); color:var(--indigo-deep); font-weight:700}
+.opt.wrong{border-color:var(--cinnabar); color:var(--cinnabar)}
+.opt[disabled]{cursor:default}
+/* ── 配對 ── */
+.match{display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin:20px 0 4px}
+@media (min-width:600px){.match{grid-template-columns:repeat(3,1fr)}}
+.mcell{
+  font:inherit; font-size:1.05rem; letter-spacing:.1em; line-height:1.45;
+  min-height:58px; padding:10px 6px; color:var(--ink); background:var(--surface);
+  border:1px solid var(--rule); border-radius:0; cursor:pointer;
+}
+.mcell.py{
+  font-family:"Noto Sans","Segoe UI",Helvetica,Arial,sans-serif; font-weight:500;
+  font-size:.88rem; letter-spacing:.01em; color:var(--indigo-deep);
+}
+.mcell:focus-visible{outline:2px solid var(--indigo); outline-offset:1px}
+.mcell.sel{background:var(--indigo-soft); border-color:var(--indigo)}
+.mcell.err{border-color:var(--cinnabar); color:var(--cinnabar)}
+.mcell.gone{opacity:.22; border-style:dotted; pointer-events:none}
+/* ── 進度存取 ── */
+.io{margin:34px 0 0; display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:.83rem}
+.io-msg{color:var(--ink-faint)}
+.io-text{flex:1 0 100%; margin:8px 0 0}
+.io-text textarea{
+  width:100%; font-family:"Noto Sans","Segoe UI",Helvetica,Arial,sans-serif; font-size:.78rem;
+  color:var(--ink); background:var(--paper); border:1px solid var(--rule); border-radius:0;
+  padding:8px 10px; resize:vertical; line-height:1.5;
+}
+.io-text textarea:focus{outline:2px solid var(--indigo); outline-offset:1px}
+.io-acts{display:flex; gap:6px; margin:6px 0 0}
+
 /* ── 回到頁首 ── */
 .totop{
   position:fixed; right:22px; bottom:22px; z-index:30; width:44px; height:44px; padding:0;
@@ -357,7 +411,7 @@ footer{
       <input id="q" type="search" placeholder="檢索詞語、拼音或釋義…" aria-label="檢索生詞">
     </label>
     <label class="pick"><span class="pick-lbl">分類</span>
-      <select id="cat" aria-label="分類篩選"><option value="all">全部（251 詞）</option><option value="new">★ 最新加入（23 詞）</option><option value="0">一、時光流逝‧歲月（11 詞）</option><option value="1">二、勤學苦讀‧精進（12 詞）</option><option value="2">三、品德修養‧志節操守（26 詞）</option><option value="3">四、言語‧口業‧論辯（15 詞）</option><option value="4">五、過失‧改過‧責任（15 詞）</option><option value="5">六、負面性情‧行為（18 詞）</option><option value="6">七、戰亂‧太平‧同心（12 詞）</option><option value="7">八、佛道‧修行用語（16 詞）</option><option value="8">九、情緒‧心境（20 詞）</option><option value="9">十、困境‧艱難‧虛妄（18 詞）</option><option value="10">十一、處事智慧‧謀略（14 詞）</option><option value="11">十二、才德‧人物‧身分（7 詞）</option><option value="12">十三、景物‧器物‧意象（30 詞）</option><option value="13">十四、日常動作‧行為（20 詞）</option><option value="14">十五、字形辨析（繁體／異體）（5 詞）</option><option value="15">十六、現代常用語‧泛用詞（12 詞）</option></select>
+      <select id="cat" aria-label="分類篩選"><option value="all">全部（251 詞）</option><option value="new">★ 最新加入（23 詞）</option><option value="due" id="optDue">◎ 今日待複習（0 詞）</option><option value="wrong" id="optWrong">✕ 錯題本（0 詞）</option><option value="0">一、時光流逝‧歲月（11 詞）</option><option value="1">二、勤學苦讀‧精進（12 詞）</option><option value="2">三、品德修養‧志節操守（26 詞）</option><option value="3">四、言語‧口業‧論辯（15 詞）</option><option value="4">五、過失‧改過‧責任（15 詞）</option><option value="5">六、負面性情‧行為（18 詞）</option><option value="6">七、戰亂‧太平‧同心（12 詞）</option><option value="7">八、佛道‧修行用語（16 詞）</option><option value="8">九、情緒‧心境（20 詞）</option><option value="9">十、困境‧艱難‧虛妄（18 詞）</option><option value="10">十一、處事智慧‧謀略（14 詞）</option><option value="11">十二、才德‧人物‧身分（7 詞）</option><option value="12">十三、景物‧器物‧意象（30 詞）</option><option value="13">十四、日常動作‧行為（20 詞）</option><option value="14">十五、字形辨析（繁體／異體）（5 詞）</option><option value="15">十六、現代常用語‧泛用詞（12 詞）</option></select>
     </label>
     <button class="tgl" id="mask" type="button" aria-pressed="false"><span class="dot"></span>遮蔽釋義</button>
     <button class="tgl" id="unknown" type="button" aria-pressed="false"><span class="dot"></span>只看未熟</button>
@@ -370,18 +424,27 @@ footer{
   <main id="list"></main>
 
   <section id="quiz" hidden aria-label="拼音測驗">
+    <div class="q-bar">
+      <label class="q-size">題型
+        <select id="qmode" aria-label="題型">
+          <option value="type" selected>打字</option>
+          <option value="choice">選擇</option>
+          <option value="match">配對</option>
+        </select>
+      </label>
+      <label class="q-size" id="qsizewrap">每輪題數
+        <select id="qsize" aria-label="每輪題數">
+          <option value="10">10</option>
+          <option value="20" selected>20</option>
+          <option value="50">50</option>
+          <option value="0">全部</option>
+        </select>
+      </label>
+    </div>
     <div class="quiz-card" id="qcard">
       <div class="q-top">
         <span>第 <b id="qi">1</b> ／ <b id="qn">0</b> 題</span>
         <span>已答對 <b id="qright">0</b></span>
-        <label class="q-size">每輪題數
-          <select id="qsize" aria-label="每輪題數">
-            <option value="10">10</option>
-            <option value="20" selected>20</option>
-            <option value="50">50</option>
-            <option value="0">全部</option>
-          </select>
-        </label>
       </div>
       <p class="q-py" id="qpy"></p>
       <p class="q-len" id="qlen"></p>
@@ -390,6 +453,7 @@ footer{
                autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done">
         <button class="tgl" type="submit" id="qsubmit">作答</button>
       </form>
+      <div class="opts" id="qopts" hidden></div>
       <p class="q-fb" id="qfb" aria-live="polite"></p>
       <div id="qhints"></div>
       <div id="qrev" hidden></div>
@@ -401,8 +465,37 @@ footer{
         <button class="chip" type="button" id="qquit">結束測驗</button>
       </div>
     </div>
+    <div class="quiz-card" id="qmatch" hidden>
+      <div class="q-top">
+        <span>第 <b id="mrnd">1</b> 輪</span>
+        <span>已配對 <b id="mok">0</b> ／ <b id="mtot">0</b></span>
+        <span>點錯 <b id="mx">0</b></span>
+      </div>
+      <div class="match" id="mgrid"></div>
+      <p class="q-fb" id="mfb" aria-live="polite"></p>
+      <div class="q-acts">
+        <button class="chip" type="button" id="mnext">下一輪</button>
+        <button class="chip" type="button" id="mquit">結束測驗</button>
+      </div>
+    </div>
     <div class="quiz-done" id="qdone" hidden></div>
   </section>
+
+  <div class="io">
+    <button class="chip" type="button" id="expbtn">匯出進度</button>
+    <button class="chip" type="button" id="impbtn">匯入進度</button>
+    <button class="chip" type="button" id="txtbtn">文字備份</button>
+    <input id="impfile" type="file" accept="application/json,.json" hidden>
+    <span class="io-msg" id="iomsg">標記與複習記錄只存在這台裝置，換手機前記得匯出。</span>
+    <div class="io-text" id="iobox" hidden>
+      <textarea id="iotext" rows="4" spellcheck="false"
+        aria-label="進度文字備份" placeholder="把備份文字貼進來，再按「從文字還原」"></textarea>
+      <div class="io-acts">
+        <button class="chip" type="button" id="txtcopy">全選複製</button>
+        <button class="chip" type="button" id="txtload">從文字還原</button>
+      </div>
+    </div>
+  </div>
 
   <footer>
     <span>拼音採漢語拼音；異讀依教育部《重編國語辭典》台灣通行音。</span>
@@ -420,9 +513,29 @@ const DATA = [{"cat":"一、時光流逝‧歲月","desc":"感嘆光陰、季節
 const $ = s => document.querySelector(s);
 const listRoot = $('#list');
 const state = { q:'', cat:'all', masked:false, onlyUnknown:false, newOnly:false, marks:{} };
-const inCat = (it, ci) => state.cat === 'new' ? !!it.nw
+const inCat = (it, ci) => state.cat === 'new'   ? !!it.nw
+                        : state.cat === 'due'   ? isDue(it.w)
+                        : state.cat === 'wrong' ? isWrong(it.w)
                         : (state.cat === 'all' || state.cat === String(ci));
 const KEY = 'shengci-marks';
+/* ── 間隔重複：每個詞記 l 級數、d 下次到期、r 答對次數、x 答錯次數、t 最後一次 ── */
+const PKEY = 'shengci-prog';
+const DAY = 864e5, STEP = [1, 2, 4, 8, 16, 32];   // 各級間隔（天）
+let prog = {};
+try{ const p = localStorage.getItem(PKEY); if (p) prog = JSON.parse(p) || {}; }catch(e){}
+function saveProg(){ try{ localStorage.setItem(PKEY, JSON.stringify(prog)); }catch(e){} }
+function pr(w){ return prog[w] || (prog[w] = {l:0, d:0, r:0, x:0, t:0}); }
+function grade(w, ok, hinted){
+  const p = pr(w), now = Date.now();
+  if (ok){ p.r++; if (!hinted) p.l = Math.min(6, p.l + 1); }
+  else { p.x++; p.l = 0; }
+  p.t = now;
+  p.d = now + (p.l ? STEP[Math.min(p.l, STEP.length) - 1] : 0) * DAY;
+  if (p.l >= 5) state.marks[w] = 1;          // 連著答對就自動鈐印
+  saveProg(); saveMarks(); updateCount();
+}
+const isDue = w => { const p = prog[w]; return !!(p && p.t && p.d <= Date.now()); };
+const isWrong = w => { const p = prog[w]; return !!(p && p.x > 0 && p.l < 3); };
 let db = null, dbWritable = false;
 
 function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
@@ -450,6 +563,7 @@ function render(){
             title="鈐印表示已熟" aria-label="標記「${esc(it.w)}」為已熟">熟</button>
           <p class="mean">${esc(it.m)}</p>
           ${it.n ? `<p class="note">${esc(it.n)}</p>` : ''}
+          ${progLine(it.w)}
         </li>`).join('')}</ol>
     </section>`;
   });
@@ -499,7 +613,28 @@ listRoot.addEventListener('click', e => {
   }
 });
 
-function updateCount(){ $('#known').textContent = Object.keys(state.marks).length; }
+function progLine(w){
+  const p = prog[w];
+  if (!p || !p.t) return '';
+  const gauge = '<span class="gauge">' +
+    [0,1,2,3,4,5].map(i => `<i class="${i < p.l ? 'on' : ''}"></i>`).join('') + '</span>';
+  const bits = [];
+  if (p.r) bits.push('答對 ' + p.r);
+  if (p.x) bits.push('答錯 ' + p.x);
+  const dd = Math.ceil((p.d - Date.now()) / DAY);
+  bits.push(p.d <= Date.now() ? '待複習' : (dd <= 1 ? '明天複習' : dd + ' 天後複習'));
+  return `<p class="prog">${gauge}<span>${bits.join('　·　')}</span></p>`;
+}
+function updateCount(){
+  $('#known').textContent = Object.keys(state.marks).length;
+  let due = 0, wrong = 0;
+  DATA.forEach(c => c.items.forEach(it => {
+    if (isDue(it.w)) due++;
+    if (isWrong(it.w)) wrong++;
+  }));
+  $('#optDue').textContent = `◎ 今日待複習（${due} 詞）`;
+  $('#optWrong').textContent = `✕ 錯題本（${wrong} 詞）`;
+}
 
 /* 標記存於各人自己的瀏覽器；擁有者另有一份雲端備份（存取規則限 owner），
    其他讀者的 db 讀寫皆被拒，只用 localStorage，彼此互不相干。 */
@@ -521,7 +656,7 @@ toTop.addEventListener('click', () => {
 });
 
 /* ── 測驗：只出拼音，作答後才揭曉釋義 ── */
-const quiz = { on:false, q:[], i:0, rec:[] };
+const quiz = { on:false, q:[], i:0, rec:[], mode:'type' };
 const norm = s => s.replace(/[\s　·・.,，。]/g,'');
 const answers = it => it.w.split('／').map(norm).concat(norm(it.w));
 const chars = s => Array.from(s.split('／')[0]).length;
@@ -548,7 +683,19 @@ function scrollToQuiz(){
   const y = el.getBoundingClientRect().top + window.scrollY - 10;
   window.scrollTo({top: Math.max(0, y), behavior:'auto'});
 }
+function makeOpts(it){
+  const all = [];
+  DATA.forEach(c => c.items.forEach(x => { if (x.w !== it.w) all.push(x); }));
+  const n = chars(it.w);
+  let cand = shuffle(all.filter(x => chars(x.w) === n)).slice(0, 3);
+  if (cand.length < 3) cand = cand.concat(shuffle(all.slice()).slice(0, 3 - cand.length));
+  return shuffle(cand.map(x => x.w).concat([it.w]));
+}
 function startQuiz(list){
+  quiz.mode = $('#qmode').value;
+  $('#qsizewrap').hidden = quiz.mode === 'match';
+  if (quiz.mode === 'match'){ startMatch(); return; }
+  $('#qmatch').hidden = true;
   let items = shuffle((list || pool()).slice());
   if (!list){
     const size = parseInt($('#qsize').value, 10) || 0;
@@ -576,7 +723,7 @@ function endQuiz(){
   quiz.on = false;
   document.body.classList.remove('quiz');
   $('#quizbtn').setAttribute('aria-pressed', false);
-  $('#quiz').hidden = true; listRoot.hidden = false;
+  $('#quiz').hidden = true; $('#qmatch').hidden = true; listRoot.hidden = false;
   render();
 }
 function maskAns(text, w){          // 提示裡若出現答案，遮成「◯」
@@ -598,7 +745,8 @@ function tiers(it){
             .map(h => ({k:h.k, t:maskAns(h.t, it.w)}));
 }
 function rec(){
-  if (!quiz.rec[quiz.i]) quiz.rec[quiz.i] = {done:false, correct:false, shown:0, tiers:tiers(quiz.q[quiz.i]), typed:''};
+  if (!quiz.rec[quiz.i]) quiz.rec[quiz.i] = {done:false, correct:false, shown:0,
+    tiers:tiers(quiz.q[quiz.i]), typed:'', picked:'', opts:makeOpts(quiz.q[quiz.i])};
   return quiz.rec[quiz.i];
 }
 function score(){ return quiz.rec.filter(r => r && r.correct).length; }
@@ -610,15 +758,28 @@ function drawHints(){
   $('#qtip').disabled = left === 0;
   $('#qtip').textContent = left === 0 ? '提示用完' : `提示（還有 ${left}）`;
 }
+function drawOpts(r, it){
+  $('#qopts').innerHTML = r.opts.map(w => {
+    let cls = 'opt';
+    if (r.done){
+      if (w === it.w) cls += ' right';
+      else if (w === r.picked) cls += ' wrong';
+    }
+    return `<button class="${cls}" type="button" data-w="${esc(w)}"${r.done ? ' disabled' : ''}>${esc(w)}</button>`;
+  }).join('');
+}
 function showQ(){
-  const it = quiz.q[quiz.i], r = rec();
+  const it = quiz.q[quiz.i], r = rec(), typing = quiz.mode === 'type';
   $('#qi').textContent = quiz.i + 1;
   $('#qn').textContent = quiz.q.length;
   $('#qright').textContent = score();
   $('#qpy').textContent = it.p;
   $('#qlen').textContent = `共 ${chars(it.w)} 字`;
+  $('#qform').hidden = !typing;
+  $('#qopts').hidden = typing;
   const inp = $('#qin');
   inp.value = r.typed || ''; inp.disabled = r.done;
+  if (!typing) drawOpts(r, it);
   $('#qfb').textContent = r.done ? (r.correct ? '答對了' : '正解如下') : '';
   $('#qfb').className = 'q-fb' + (r.done ? (r.correct ? ' good' : ' bad') : '');
   drawHints();
@@ -628,7 +789,7 @@ function showQ(){
   $('#qshow').disabled = r.done;
   $('#qprev').disabled = quiz.i === 0;
   $('#qnext').textContent = last ? '看成績' : '下一題';
-  if (!r.done) inp.focus();
+  if (!r.done && typing) inp.focus();
 }
 function drawReveal(){
   const it = quiz.q[quiz.i];
@@ -642,7 +803,9 @@ function drawReveal(){
 function reveal(correct){
   const r = rec();
   if (r.done) return;
-  r.done = true; r.correct = correct; r.typed = $('#qin').value;
+  r.done = true; r.correct = correct;
+  if (quiz.mode === 'type') r.typed = $('#qin').value;
+  grade(quiz.q[quiz.i].w, correct, r.shown > 0);
   showQ();
 }
 function nextQ(){
@@ -672,6 +835,15 @@ function finish(){
 }
 
 $('#quizbtn').addEventListener('click', () => { quiz.on ? endQuiz() : startQuiz(); });
+$('#qmode').addEventListener('change', () => { if (quiz.on) startQuiz(); });
+$('#qopts').addEventListener('click', e => {
+  const b = e.target.closest('.opt');
+  if (!b) return;
+  const r = rec();
+  if (r.done) return;
+  r.picked = b.dataset.w;
+  reveal(b.dataset.w === quiz.q[quiz.i].w);
+});
 $('#qsize').addEventListener('change', () => { if (quiz.on) startQuiz(); });
 $('#qform').addEventListener('submit', e => {
   e.preventDefault();
@@ -707,6 +879,140 @@ $('#quiz').addEventListener('click', e => {
   else endQuiz();
 });
 addEventListener('keydown', e => { if (e.key === 'Escape' && quiz.on) endQuiz(); });
+
+/* ── 配對：詞 ↔ 拼音，一輪六組 ── */
+const match = { pairs:[], sel:null, ok:0, x:0, rnd:0, bad:{}, busy:false };
+function startMatch(){
+  quiz.on = true;
+  document.body.classList.add('quiz');
+  $('#quizbtn').setAttribute('aria-pressed', true);
+  $('#quiz').hidden = false; listRoot.hidden = true;
+  $('#qcard').hidden = true; $('#qdone').hidden = true; $('#qmatch').hidden = false;
+  if (state.masked) $('#mask').click();
+  match.rnd = 0; match.x = 0;
+  newRound();
+  scrollToQuiz();
+}
+function newRound(){
+  const p = pool();
+  if (p.length < 2){
+    $('#qmatch').hidden = true; $('#qdone').hidden = false;
+    $('#qdone').innerHTML = `<h3>此範圍沒有可測的詞</h3>
+      <p class="cap">換一個分類，或關掉「只看未熟」再試。</p>`;
+    return;
+  }
+  match.pairs = shuffle(p.slice()).slice(0, Math.min(6, p.length));
+  match.rnd++; match.ok = 0; match.sel = null; match.bad = {}; match.busy = false;
+  const cells = [];
+  match.pairs.forEach((it, i) => {
+    cells.push({k:'w', i, t:it.w.split('／')[0]});
+    cells.push({k:'p', i, t:it.p.split('／')[0]});
+  });
+  shuffle(cells);
+  $('#mgrid').innerHTML = cells.map(c =>
+    `<button class="mcell${c.k === 'p' ? ' py' : ''}" type="button" data-i="${c.i}" data-k="${c.k}">${esc(c.t)}</button>`
+  ).join('');
+  $('#mrnd').textContent = match.rnd;
+  $('#mok').textContent = 0;
+  $('#mtot').textContent = match.pairs.length;
+  $('#mx').textContent = match.x;
+  $('#mfb').textContent = ''; $('#mfb').className = 'q-fb';
+}
+$('#mgrid').addEventListener('click', e => {
+  const b = e.target.closest('.mcell');
+  if (!b || match.busy || b.classList.contains('gone')) return;
+  const a = match.sel;
+  if (!a){ match.sel = b; b.classList.add('sel'); return; }
+  if (a === b){ b.classList.remove('sel'); match.sel = null; return; }
+  if (a.dataset.k === b.dataset.k){          // 同一欄，改選這個
+    a.classList.remove('sel'); match.sel = b; b.classList.add('sel'); return;
+  }
+  if (a.dataset.i === b.dataset.i){          // 配對成功
+    a.classList.add('gone'); b.classList.add('gone'); a.classList.remove('sel');
+    match.sel = null; match.ok++;
+    $('#mok').textContent = match.ok;
+    const it = match.pairs[+a.dataset.i];
+    grade(it.w, !match.bad[a.dataset.i], false);
+    if (match.ok === match.pairs.length){
+      $('#mfb').textContent = `這一輪配完了，點錯 ${match.x} 次`;
+      $('#mfb').className = 'q-fb good';
+    }
+  } else {                                   // 配錯
+    match.x++; $('#mx').textContent = match.x;
+    match.bad[a.dataset.i] = 1; match.bad[b.dataset.i] = 1;
+    a.classList.add('err'); b.classList.add('err'); match.busy = true;
+    setTimeout(() => {
+      a.classList.remove('err', 'sel'); b.classList.remove('err');
+      match.sel = null; match.busy = false;
+    }, 420);
+  }
+});
+$('#mnext').addEventListener('click', () => { newRound(); scrollToQuiz(); });
+$('#mquit').addEventListener('click', endQuiz);
+
+/* ── 進度匯出／匯入 ── */
+function iomsg(t){ $('#iomsg').textContent = t; }
+function dump(){
+  return JSON.stringify({app:'shengci', v:1, at:new Date().toISOString(), marks:state.marks, prog});
+}
+function restore(text){
+  const d = JSON.parse(text);
+  if (!d || typeof d !== 'object') throw new Error('bad');
+  let a = 0, b = 0;
+  if (d.marks) Object.keys(d.marks).forEach(w => { if (!state.marks[w]){ state.marks[w] = 1; a++; } });
+  if (d.prog) Object.keys(d.prog).forEach(w => {
+    const n = d.prog[w], o = prog[w];
+    if (n && (!o || (n.t || 0) > (o.t || 0))){ prog[w] = n; b++; }
+  });
+  saveMarks(); saveProg(); updateCount(); render();
+  iomsg(`已匯入：新增 ${a} 個熟字、${b} 筆複習記錄（原有記錄保留較新的）。`);
+}
+$('#expbtn').addEventListener('click', () => {
+  try{
+    const url = URL.createObjectURL(new Blob([dump()], {type:'application/json'}));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '生詞集解-進度-' + new Date().toISOString().slice(0, 10) + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    iomsg('已匯出，檔案在「下載」或「檔案」裡。若找不到，改用「文字備份」。');
+  }catch(err){
+    $('#iobox').hidden = false; $('#iotext').value = dump();
+    iomsg('這個瀏覽器擋下載，請改用下面的文字備份：全選複製，存到記事本。');
+  }
+});
+$('#txtbtn').addEventListener('click', () => {
+  const box = $('#iobox');
+  box.hidden = !box.hidden;
+  if (!box.hidden){
+    $('#iotext').value = dump();
+    iomsg('複製這段文字存起來，換裝置時貼回來按「從文字還原」。');
+  }
+});
+$('#txtcopy').addEventListener('click', () => {
+  const t = $('#iotext');
+  t.select(); t.setSelectionRange(0, 999999);
+  let ok = false;
+  try{ ok = document.execCommand('copy'); }catch(e){}
+  if (!ok && navigator.clipboard){ navigator.clipboard.writeText(t.value).then(() => iomsg('已複製。')); return; }
+  iomsg(ok ? '已複製。' : '複製失敗，請長按文字自行複製。');
+});
+$('#txtload').addEventListener('click', () => {
+  try{ restore($('#iotext').value.trim()); }
+  catch(err){ iomsg('這段文字讀不出來，請確認是本站的備份。'); }
+});
+$('#impbtn').addEventListener('click', () => $('#impfile').click());
+$('#impfile').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try{ restore(rd.result); }
+    catch(err){ iomsg('讀不出這個檔，請確認是本站匯出的 JSON。'); }
+    e.target.value = '';
+  };
+  rd.readAsText(f);
+});
 
 
 /* ── 明／暗切換（獨立版）── */
