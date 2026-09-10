@@ -315,17 +315,37 @@ body.quiz .controls{position:relative; z-index:auto}
 /* ── 手寫輸入建議 ── */
 .q-write{margin:14px 0 0; font-size:.82rem; color:var(--ink-faint); letter-spacing:.08em; text-align:center}
 
-/* ── 注音對照表 ── */
-.ref{margin:40px 0 0}
-body.quiz .ref{display:none}
-.ref summary{
-  cursor:pointer; color:var(--indigo); letter-spacing:.12em; font-size:.95rem;
-  list-style-position:inside;
+/* ── 注音對照表（浮動鈕 ＋ 彈出層） ── */
+.refbtn{
+  position:fixed; right:22px; bottom:76px; z-index:30; width:44px; height:44px; padding:0;
+  display:grid; place-items:center; cursor:pointer;
+  font-family:inherit; font-size:1.05rem; letter-spacing:0;
+  background:var(--surface); color:var(--indigo);
+  border:1px solid var(--ink); border-radius:0;
+  box-shadow:0 2px 12px rgba(0,0,0,.16);
 }
-.ref summary::marker{color:var(--rule)}
-.ref[open] summary{margin-bottom:6px}
+.refbtn::after{content:""; position:absolute; inset:3px; border:1px solid var(--rule-soft)}
+.refbtn:hover{color:var(--cinnabar); border-color:var(--cinnabar)}
+.refbtn:focus-visible{outline:2px solid var(--indigo); outline-offset:2px}
+.modal{
+  position:fixed; inset:0; z-index:60; display:grid; place-items:center;
+  padding:20px 14px; background:rgba(20,17,13,.5);
+}
+.modal-box{
+  width:min(640px,100%); max-height:84vh; display:flex; flex-direction:column;
+  background:var(--paper); border:1px solid var(--ink);
+  box-shadow:0 6px 30px rgba(0,0,0,.3); position:relative;
+}
+.modal-box::after{content:""; position:absolute; inset:4px; border:1px solid var(--rule); pointer-events:none}
+.modal-head{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:16px 20px 10px; border-bottom:1px solid var(--rule-soft); margin:4px 4px 0;
+}
+.modal-head h3{margin:0; font-size:1.02rem; font-weight:700; letter-spacing:.14em; color:var(--ink)}
+.modal-body{overflow:auto; padding:4px 20px 22px; margin:0 4px 4px}
+.modal-body h4:first-of-type{margin-top:14px}
 .ref-lead, .ref-note{font-size:.82rem; color:var(--ink-faint); margin:8px 0 0; line-height:1.7}
-.ref h4{
+.modal-body h4{
   margin:20px 0 0; font-size:.85rem; font-weight:700; letter-spacing:.14em;
   color:var(--ink-soft); border-bottom:1px solid var(--rule-soft); padding-bottom:5px;
 }
@@ -387,6 +407,7 @@ footer{
   .head .w{font-size:1.2rem}
   .quiz-card,.quiz-done{padding:20px 16px 18px}
   .totop{right:14px; bottom:14px; width:40px; height:40px}
+  .refbtn{right:14px; bottom:62px; width:40px; height:40px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
 </style>
@@ -464,30 +485,6 @@ footer{
     <div class="quiz-done" id="qdone" hidden></div>
   </section>
 
-  <section class="ref" id="ref">
-    <details>
-      <summary>注音‧拼音對照表</summary>
-      <p class="ref-lead">本站一律標漢語拼音。佛堂講義、國語辭典多用注音，兩邊對照如下。</p>
-      <h4>聲調</h4>
-      <div class="pygrid tone"><div class="cell"><span class="bp">陰平（不標）</span><span class="py">ā</span></div><div class="cell"><span class="bp">ˊ 陽平</span><span class="py">á</span></div><div class="cell"><span class="bp">ˇ 上聲</span><span class="py">ǎ</span></div><div class="cell"><span class="bp">ˋ 去聲</span><span class="py">à</span></div><div class="cell"><span class="bp">˙ 輕聲（標在前）</span><span class="py">a</span></div></div>
-      <h4>聲母（21）</h4>
-      <div class="pygrid"><div class="cell"><span class="bp">ㄅ</span><span class="py">b</span></div><div class="cell"><span class="bp">ㄆ</span><span class="py">p</span></div><div class="cell"><span class="bp">ㄇ</span><span class="py">m</span></div><div class="cell"><span class="bp">ㄈ</span><span class="py">f</span></div><div class="cell"><span class="bp">ㄉ</span><span class="py">d</span></div><div class="cell"><span class="bp">ㄊ</span><span class="py">t</span></div><div class="cell"><span class="bp">ㄋ</span><span class="py">n</span></div><div class="cell"><span class="bp">ㄌ</span><span class="py">l</span></div><div class="cell"><span class="bp">ㄍ</span><span class="py">g</span></div><div class="cell"><span class="bp">ㄎ</span><span class="py">k</span></div><div class="cell"><span class="bp">ㄏ</span><span class="py">h</span></div><div class="cell"><span class="bp">ㄐ</span><span class="py">j</span></div><div class="cell"><span class="bp">ㄑ</span><span class="py">q</span></div><div class="cell"><span class="bp">ㄒ</span><span class="py">x</span></div><div class="cell"><span class="bp">ㄓ</span><span class="py">zh</span></div><div class="cell"><span class="bp">ㄔ</span><span class="py">ch</span></div><div class="cell"><span class="bp">ㄕ</span><span class="py">sh</span></div><div class="cell"><span class="bp">ㄖ</span><span class="py">r</span></div><div class="cell"><span class="bp">ㄗ</span><span class="py">z</span></div><div class="cell"><span class="bp">ㄘ</span><span class="py">c</span></div><div class="cell"><span class="bp">ㄙ</span><span class="py">s</span></div></div>
-      <h4>韻母與介音（16）</h4>
-      <div class="pygrid"><div class="cell"><span class="bp">ㄚ</span><span class="py">a</span></div><div class="cell"><span class="bp">ㄛ</span><span class="py">o</span></div><div class="cell"><span class="bp">ㄜ</span><span class="py">e</span></div><div class="cell"><span class="bp">ㄝ</span><span class="py">ê</span></div><div class="cell"><span class="bp">ㄞ</span><span class="py">ai</span></div><div class="cell"><span class="bp">ㄟ</span><span class="py">ei</span></div><div class="cell"><span class="bp">ㄠ</span><span class="py">ao</span></div><div class="cell"><span class="bp">ㄡ</span><span class="py">ou</span></div><div class="cell"><span class="bp">ㄢ</span><span class="py">an</span></div><div class="cell"><span class="bp">ㄣ</span><span class="py">en</span></div><div class="cell"><span class="bp">ㄤ</span><span class="py">ang</span></div><div class="cell"><span class="bp">ㄥ</span><span class="py">eng</span></div><div class="cell"><span class="bp">ㄦ</span><span class="py">er</span></div><div class="cell"><span class="bp">ㄧ</span><span class="py">i（yi）</span></div><div class="cell"><span class="bp">ㄨ</span><span class="py">u（wu）</span></div><div class="cell"><span class="bp">ㄩ</span><span class="py">ü（yu）</span></div></div>
-      <h4>結合韻</h4>
-      <div class="pygrid"><div class="cell"><span class="bp">ㄧㄚ</span><span class="py">ia（ya）</span></div><div class="cell"><span class="bp">ㄧㄝ</span><span class="py">ie（ye）</span></div><div class="cell"><span class="bp">ㄧㄠ</span><span class="py">iao（yao）</span></div><div class="cell"><span class="bp">ㄧㄡ</span><span class="py">iu（you）</span></div><div class="cell"><span class="bp">ㄧㄢ</span><span class="py">ian（yan）</span></div><div class="cell"><span class="bp">ㄧㄣ</span><span class="py">in（yin）</span></div><div class="cell"><span class="bp">ㄧㄤ</span><span class="py">iang（yang）</span></div><div class="cell"><span class="bp">ㄧㄥ</span><span class="py">ing（ying）</span></div><div class="cell"><span class="bp">ㄨㄚ</span><span class="py">ua（wa）</span></div><div class="cell"><span class="bp">ㄨㄛ</span><span class="py">uo（wo）</span></div><div class="cell"><span class="bp">ㄨㄞ</span><span class="py">uai（wai）</span></div><div class="cell"><span class="bp">ㄨㄟ</span><span class="py">ui（wei）</span></div><div class="cell"><span class="bp">ㄨㄢ</span><span class="py">uan（wan）</span></div><div class="cell"><span class="bp">ㄨㄣ</span><span class="py">un（wen）</span></div><div class="cell"><span class="bp">ㄨㄤ</span><span class="py">uang（wang）</span></div><div class="cell"><span class="bp">ㄨㄥ</span><span class="py">ong（weng）</span></div><div class="cell"><span class="bp">ㄩㄝ</span><span class="py">üe（yue）</span></div><div class="cell"><span class="bp">ㄩㄢ</span><span class="py">üan（yuan）</span></div><div class="cell"><span class="bp">ㄩㄣ</span><span class="py">ün（yun）</span></div><div class="cell"><span class="bp">ㄩㄥ</span><span class="py">iong（yong）</span></div></div>
-      <p class="ref-note">括號裡是自成音節（前面沒有聲母）時的寫法。</p>
-      <h4>幾條容易搞混的拼寫規則</h4>
-      <ol class="ref-rules">
-        <li>ㄓㄔㄕㄖㄗㄘㄙ 單獨成音節時，拼音要補一個 i：ㄓ zhī、ㄗ zī、ㄙ sì。</li>
-        <li>ㄧㄨㄩ 自成音節寫 yi、wu、yu，開頭也改寫 y-／w-：ㄧㄡ you、ㄨㄟ wei、ㄩㄢ yuan。</li>
-        <li>前面有聲母時要省寫：ㄧㄡ→-iu（ㄋㄧㄡ niu）、ㄨㄟ→-ui（ㄍㄨㄟ gui）、ㄨㄣ→-un（ㄎㄨㄣ kun）。</li>
-        <li>ㄐㄑㄒ 配ㄩ時，ü 上兩點省去：ㄐㄩ ju、ㄒㄩㄢ xuan；ㄋㄩ nü、ㄌㄩ lü 則保留。</li>
-        <li>聲調符號標在主要元音上：ㄏㄠˇ hǎo、ㄐㄧㄡˋ jiù、ㄍㄨㄟˋ guì。</li>
-      </ol>
-    </details>
-  </section>
-
   <div class="io">
     <button class="chip" type="button" id="expbtn">匯出進度</button>
     <button class="chip" type="button" id="impbtn">匯入進度</button>
@@ -511,7 +508,37 @@ footer{
 
 </div></div></div>
 
-<button class="totop" id="totop" type="button" aria-label="回到頁首" title="回到頁首">
+  <div class="modal" id="refmodal" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="注音‧拼音對照表">
+      <div class="modal-head">
+        <h3>注音‧拼音對照表</h3>
+        <button class="chip" type="button" id="refclose">關閉</button>
+      </div>
+      <div class="modal-body">
+      <p class="ref-lead">本站一律標漢語拼音。佛堂講義、國語辭典多用注音，兩邊對照如下。</p>
+      <h4>聲調</h4>
+      <div class="pygrid tone"><div class="cell"><span class="bp">陰平（不標）</span><span class="py">ā</span></div><div class="cell"><span class="bp">ˊ 陽平</span><span class="py">á</span></div><div class="cell"><span class="bp">ˇ 上聲</span><span class="py">ǎ</span></div><div class="cell"><span class="bp">ˋ 去聲</span><span class="py">à</span></div><div class="cell"><span class="bp">˙ 輕聲（標在前）</span><span class="py">a</span></div></div>
+      <h4>聲母（21）</h4>
+      <div class="pygrid"><div class="cell"><span class="bp">ㄅ</span><span class="py">b</span></div><div class="cell"><span class="bp">ㄆ</span><span class="py">p</span></div><div class="cell"><span class="bp">ㄇ</span><span class="py">m</span></div><div class="cell"><span class="bp">ㄈ</span><span class="py">f</span></div><div class="cell"><span class="bp">ㄉ</span><span class="py">d</span></div><div class="cell"><span class="bp">ㄊ</span><span class="py">t</span></div><div class="cell"><span class="bp">ㄋ</span><span class="py">n</span></div><div class="cell"><span class="bp">ㄌ</span><span class="py">l</span></div><div class="cell"><span class="bp">ㄍ</span><span class="py">g</span></div><div class="cell"><span class="bp">ㄎ</span><span class="py">k</span></div><div class="cell"><span class="bp">ㄏ</span><span class="py">h</span></div><div class="cell"><span class="bp">ㄐ</span><span class="py">j</span></div><div class="cell"><span class="bp">ㄑ</span><span class="py">q</span></div><div class="cell"><span class="bp">ㄒ</span><span class="py">x</span></div><div class="cell"><span class="bp">ㄓ</span><span class="py">zh</span></div><div class="cell"><span class="bp">ㄔ</span><span class="py">ch</span></div><div class="cell"><span class="bp">ㄕ</span><span class="py">sh</span></div><div class="cell"><span class="bp">ㄖ</span><span class="py">r</span></div><div class="cell"><span class="bp">ㄗ</span><span class="py">z</span></div><div class="cell"><span class="bp">ㄘ</span><span class="py">c</span></div><div class="cell"><span class="bp">ㄙ</span><span class="py">s</span></div></div>
+      <h4>韻母與介音（16）</h4>
+      <div class="pygrid"><div class="cell"><span class="bp">ㄚ</span><span class="py">a</span></div><div class="cell"><span class="bp">ㄛ</span><span class="py">o</span></div><div class="cell"><span class="bp">ㄜ</span><span class="py">e</span></div><div class="cell"><span class="bp">ㄝ</span><span class="py">ê</span></div><div class="cell"><span class="bp">ㄞ</span><span class="py">ai</span></div><div class="cell"><span class="bp">ㄟ</span><span class="py">ei</span></div><div class="cell"><span class="bp">ㄠ</span><span class="py">ao</span></div><div class="cell"><span class="bp">ㄡ</span><span class="py">ou</span></div><div class="cell"><span class="bp">ㄢ</span><span class="py">an</span></div><div class="cell"><span class="bp">ㄣ</span><span class="py">en</span></div><div class="cell"><span class="bp">ㄤ</span><span class="py">ang</span></div><div class="cell"><span class="bp">ㄥ</span><span class="py">eng</span></div><div class="cell"><span class="bp">ㄦ</span><span class="py">er</span></div><div class="cell"><span class="bp">ㄧ</span><span class="py">i（yi）</span></div><div class="cell"><span class="bp">ㄨ</span><span class="py">u（wu）</span></div><div class="cell"><span class="bp">ㄩ</span><span class="py">ü（yu）</span></div></div>
+      <h4>結合韻</h4>
+      <div class="pygrid"><div class="cell"><span class="bp">ㄧㄚ</span><span class="py">ia（ya）</span></div><div class="cell"><span class="bp">ㄧㄝ</span><span class="py">ie（ye）</span></div><div class="cell"><span class="bp">ㄧㄠ</span><span class="py">iao（yao）</span></div><div class="cell"><span class="bp">ㄧㄡ</span><span class="py">iu（you）</span></div><div class="cell"><span class="bp">ㄧㄢ</span><span class="py">ian（yan）</span></div><div class="cell"><span class="bp">ㄧㄣ</span><span class="py">in（yin）</span></div><div class="cell"><span class="bp">ㄧㄤ</span><span class="py">iang（yang）</span></div><div class="cell"><span class="bp">ㄧㄥ</span><span class="py">ing（ying）</span></div><div class="cell"><span class="bp">ㄨㄚ</span><span class="py">ua（wa）</span></div><div class="cell"><span class="bp">ㄨㄛ</span><span class="py">uo（wo）</span></div><div class="cell"><span class="bp">ㄨㄞ</span><span class="py">uai（wai）</span></div><div class="cell"><span class="bp">ㄨㄟ</span><span class="py">ui（wei）</span></div><div class="cell"><span class="bp">ㄨㄢ</span><span class="py">uan（wan）</span></div><div class="cell"><span class="bp">ㄨㄣ</span><span class="py">un（wen）</span></div><div class="cell"><span class="bp">ㄨㄤ</span><span class="py">uang（wang）</span></div><div class="cell"><span class="bp">ㄨㄥ</span><span class="py">ong（weng）</span></div><div class="cell"><span class="bp">ㄩㄝ</span><span class="py">üe（yue）</span></div><div class="cell"><span class="bp">ㄩㄢ</span><span class="py">üan（yuan）</span></div><div class="cell"><span class="bp">ㄩㄣ</span><span class="py">ün（yun）</span></div><div class="cell"><span class="bp">ㄩㄥ</span><span class="py">iong（yong）</span></div></div>
+      <p class="ref-note">括號裡是自成音節（前面沒有聲母）時的寫法。</p>
+      <h4>幾條容易搞混的拼寫規則</h4>
+      <ol class="ref-rules">
+        <li>ㄓㄔㄕㄖㄗㄘㄙ 單獨成音節時，拼音要補一個 i：ㄓ zhī、ㄗ zī、ㄙ sì。</li>
+        <li>ㄧㄨㄩ 自成音節寫 yi、wu、yu，開頭也改寫 y-／w-：ㄧㄡ you、ㄨㄟ wei、ㄩㄢ yuan。</li>
+        <li>前面有聲母時要省寫：ㄧㄡ→-iu（ㄋㄧㄡ niu）、ㄨㄟ→-ui（ㄍㄨㄟ gui）、ㄨㄣ→-un（ㄎㄨㄣ kun）。</li>
+        <li>ㄐㄑㄒ 配ㄩ時，ü 上兩點省去：ㄐㄩ ju、ㄒㄩㄢ xuan；ㄋㄩ nü、ㄌㄩ lü 則保留。</li>
+        <li>聲調符號標在主要元音上：ㄏㄠˇ hǎo、ㄐㄧㄡˋ jiù、ㄍㄨㄟˋ guì。</li>
+      </ol>
+      </div>
+    </div>
+  </div>
+
+  <button class="refbtn" id="refbtn" type="button" aria-label="注音‧拼音對照表" title="注音‧拼音對照表">音</button>
+  <button class="totop" id="totop" type="button" aria-label="回到頁首" title="回到頁首">
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V5"></path><path d="M5.5 11.5L12 5l6.5 6.5"></path></svg>
 </button>
 
@@ -655,6 +682,20 @@ try{ const c = localStorage.getItem(KEY); if (c) state.marks = JSON.parse(c) || 
 render(); updateCount();
 
 /* ── 回到頁首 ── */
+const refModal = $('#refmodal');
+function openRef(){
+  refModal.hidden = false;
+  document.body.style.overflow = 'hidden';
+  $('#refclose').focus();
+}
+function closeRef(){
+  refModal.hidden = true;
+  document.body.style.overflow = '';
+}
+$('#refbtn').addEventListener('click', openRef);
+$('#refclose').addEventListener('click', closeRef);
+refModal.addEventListener('click', e => { if (e.target === refModal) closeRef(); });
+
 const toTop = $('#totop');
 addEventListener('scroll', () => toTop.classList.toggle('show', window.scrollY > 400), {passive:true});
 toTop.addEventListener('click', () => {
@@ -850,7 +891,11 @@ $('#quiz').addEventListener('click', e => {
   else if (act.dataset.act === 'retry-wrong') startQuiz(quiz.wrongList);
   else endQuiz();
 });
-addEventListener('keydown', e => { if (e.key === 'Escape' && quiz.on) endQuiz(); });
+addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (!refModal.hidden){ closeRef(); return; }   // 對照表開著時，Esc 先關它
+  if (quiz.on) endQuiz();
+});
 
 /* ── 進度匯出／匯入 ── */
 function iomsg(t){ $('#iomsg').textContent = t; }
