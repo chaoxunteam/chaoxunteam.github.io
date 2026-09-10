@@ -312,34 +312,9 @@ body.quiz .controls{position:relative; z-index:auto}
   display:flex; gap:8px 18px; flex-wrap:wrap; justify-content:flex-end;
   margin:0 0 10px; font-size:.84rem; color:var(--ink-faint); letter-spacing:.06em;
 }
-/* ── 選擇題 ── */
-.opts{display:grid; gap:8px; max-width:32ch; margin:4px auto 0}
-.opt{
-  font:inherit; font-size:1.08rem; letter-spacing:.12em; text-align:center;
-  padding:11px 12px; color:var(--ink); background:var(--surface);
-  border:1px solid var(--rule); border-radius:0; cursor:pointer;
-}
-.opt:hover{border-color:var(--indigo); color:var(--indigo)}
-.opt:focus-visible{outline:2px solid var(--indigo); outline-offset:1px}
-.opt.right{background:var(--indigo-soft); border-color:var(--indigo); color:var(--indigo-deep); font-weight:700}
-.opt.wrong{border-color:var(--cinnabar); color:var(--cinnabar)}
-.opt[disabled]{cursor:default}
-/* ── 配對 ── */
-.match{display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin:20px 0 4px}
-@media (min-width:600px){.match{grid-template-columns:repeat(3,1fr)}}
-.mcell{
-  font:inherit; font-size:1.05rem; letter-spacing:.1em; line-height:1.45;
-  min-height:58px; padding:10px 6px; color:var(--ink); background:var(--surface);
-  border:1px solid var(--rule); border-radius:0; cursor:pointer;
-}
-.mcell.py{
-  font-family:"Noto Sans","Segoe UI",Helvetica,Arial,sans-serif; font-weight:500;
-  font-size:.88rem; letter-spacing:.01em; color:var(--indigo-deep);
-}
-.mcell:focus-visible{outline:2px solid var(--indigo); outline-offset:1px}
-.mcell.sel{background:var(--indigo-soft); border-color:var(--indigo)}
-.mcell.err{border-color:var(--cinnabar); color:var(--cinnabar)}
-.mcell.gone{opacity:.22; border-style:dotted; pointer-events:none}
+/* ── 手寫輸入建議 ── */
+.q-write{margin:14px 0 0; font-size:.82rem; color:var(--ink-faint); letter-spacing:.08em; text-align:center}
+
 /* ── 進度存取 ── */
 .io{margin:34px 0 0; display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:.83rem}
 .io-msg{color:var(--ink-faint)}
@@ -425,13 +400,6 @@ footer{
 
   <section id="quiz" hidden aria-label="拼音測驗">
     <div class="q-bar">
-      <label class="q-size">題型
-        <select id="qmode" aria-label="題型">
-          <option value="type" selected>打字</option>
-          <option value="choice">選擇</option>
-          <option value="match">配對</option>
-        </select>
-      </label>
       <label class="q-size" id="qsizewrap">每輪題數
         <select id="qsize" aria-label="每輪題數">
           <option value="10">10</option>
@@ -453,7 +421,7 @@ footer{
                autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done">
         <button class="tgl" type="submit" id="qsubmit">作答</button>
       </form>
-      <div class="opts" id="qopts" hidden></div>
+      <p class="q-write">建議用手寫輸入作答</p>
       <p class="q-fb" id="qfb" aria-live="polite"></p>
       <div id="qhints"></div>
       <div id="qrev" hidden></div>
@@ -463,19 +431,6 @@ footer{
         <button class="chip" type="button" id="qshow">看答案</button>
         <button class="chip" type="button" id="qnext">下一題</button>
         <button class="chip" type="button" id="qquit">結束測驗</button>
-      </div>
-    </div>
-    <div class="quiz-card" id="qmatch" hidden>
-      <div class="q-top">
-        <span>第 <b id="mrnd">1</b> 輪</span>
-        <span>已配對 <b id="mok">0</b> ／ <b id="mtot">0</b></span>
-        <span>點錯 <b id="mx">0</b></span>
-      </div>
-      <div class="match" id="mgrid"></div>
-      <p class="q-fb" id="mfb" aria-live="polite"></p>
-      <div class="q-acts">
-        <button class="chip" type="button" id="mnext">下一輪</button>
-        <button class="chip" type="button" id="mquit">結束測驗</button>
       </div>
     </div>
     <div class="quiz-done" id="qdone" hidden></div>
@@ -656,7 +611,7 @@ toTop.addEventListener('click', () => {
 });
 
 /* ── 測驗：只出拼音，作答後才揭曉釋義 ── */
-const quiz = { on:false, q:[], i:0, rec:[], mode:'type' };
+const quiz = { on:false, q:[], i:0, rec:[] };
 const norm = s => s.replace(/[\s　·・.,，。]/g,'');
 const answers = it => it.w.split('／').map(norm).concat(norm(it.w));
 const chars = s => Array.from(s.split('／')[0]).length;
@@ -683,19 +638,7 @@ function scrollToQuiz(){
   const y = el.getBoundingClientRect().top + window.scrollY - 10;
   window.scrollTo({top: Math.max(0, y), behavior:'auto'});
 }
-function makeOpts(it){
-  const all = [];
-  DATA.forEach(c => c.items.forEach(x => { if (x.w !== it.w) all.push(x); }));
-  const n = chars(it.w);
-  let cand = shuffle(all.filter(x => chars(x.w) === n)).slice(0, 3);
-  if (cand.length < 3) cand = cand.concat(shuffle(all.slice()).slice(0, 3 - cand.length));
-  return shuffle(cand.map(x => x.w).concat([it.w]));
-}
 function startQuiz(list){
-  quiz.mode = $('#qmode').value;
-  $('#qsizewrap').hidden = quiz.mode === 'match';
-  if (quiz.mode === 'match'){ startMatch(); return; }
-  $('#qmatch').hidden = true;
   let items = shuffle((list || pool()).slice());
   if (!list){
     const size = parseInt($('#qsize').value, 10) || 0;
@@ -723,7 +666,7 @@ function endQuiz(){
   quiz.on = false;
   document.body.classList.remove('quiz');
   $('#quizbtn').setAttribute('aria-pressed', false);
-  $('#quiz').hidden = true; $('#qmatch').hidden = true; listRoot.hidden = false;
+  $('#quiz').hidden = true; listRoot.hidden = false;
   render();
 }
 function maskAns(text, w){          // 提示裡若出現答案，遮成「◯」
@@ -746,7 +689,7 @@ function tiers(it){
 }
 function rec(){
   if (!quiz.rec[quiz.i]) quiz.rec[quiz.i] = {done:false, correct:false, shown:0,
-    tiers:tiers(quiz.q[quiz.i]), typed:'', picked:'', opts:makeOpts(quiz.q[quiz.i])};
+    tiers:tiers(quiz.q[quiz.i]), typed:''};
   return quiz.rec[quiz.i];
 }
 function score(){ return quiz.rec.filter(r => r && r.correct).length; }
@@ -758,28 +701,15 @@ function drawHints(){
   $('#qtip').disabled = left === 0;
   $('#qtip').textContent = left === 0 ? '提示用完' : `提示（還有 ${left}）`;
 }
-function drawOpts(r, it){
-  $('#qopts').innerHTML = r.opts.map(w => {
-    let cls = 'opt';
-    if (r.done){
-      if (w === it.w) cls += ' right';
-      else if (w === r.picked) cls += ' wrong';
-    }
-    return `<button class="${cls}" type="button" data-w="${esc(w)}"${r.done ? ' disabled' : ''}>${esc(w)}</button>`;
-  }).join('');
-}
 function showQ(){
-  const it = quiz.q[quiz.i], r = rec(), typing = quiz.mode === 'type';
+  const it = quiz.q[quiz.i], r = rec();
   $('#qi').textContent = quiz.i + 1;
   $('#qn').textContent = quiz.q.length;
   $('#qright').textContent = score();
   $('#qpy').textContent = it.p;
   $('#qlen').textContent = `共 ${chars(it.w)} 字`;
-  $('#qform').hidden = !typing;
-  $('#qopts').hidden = typing;
   const inp = $('#qin');
   inp.value = r.typed || ''; inp.disabled = r.done;
-  if (!typing) drawOpts(r, it);
   $('#qfb').textContent = r.done ? (r.correct ? '答對了' : '正解如下') : '';
   $('#qfb').className = 'q-fb' + (r.done ? (r.correct ? ' good' : ' bad') : '');
   drawHints();
@@ -789,7 +719,7 @@ function showQ(){
   $('#qshow').disabled = r.done;
   $('#qprev').disabled = quiz.i === 0;
   $('#qnext').textContent = last ? '看成績' : '下一題';
-  if (!r.done && typing) inp.focus();
+  if (!r.done) inp.focus();
 }
 function drawReveal(){
   const it = quiz.q[quiz.i];
@@ -803,8 +733,7 @@ function drawReveal(){
 function reveal(correct){
   const r = rec();
   if (r.done) return;
-  r.done = true; r.correct = correct;
-  if (quiz.mode === 'type') r.typed = $('#qin').value;
+  r.done = true; r.correct = correct; r.typed = $('#qin').value;
   grade(quiz.q[quiz.i].w, correct, r.shown > 0);
   showQ();
 }
@@ -835,15 +764,6 @@ function finish(){
 }
 
 $('#quizbtn').addEventListener('click', () => { quiz.on ? endQuiz() : startQuiz(); });
-$('#qmode').addEventListener('change', () => { if (quiz.on) startQuiz(); });
-$('#qopts').addEventListener('click', e => {
-  const b = e.target.closest('.opt');
-  if (!b) return;
-  const r = rec();
-  if (r.done) return;
-  r.picked = b.dataset.w;
-  reveal(b.dataset.w === quiz.q[quiz.i].w);
-});
 $('#qsize').addEventListener('change', () => { if (quiz.on) startQuiz(); });
 $('#qform').addEventListener('submit', e => {
   e.preventDefault();
@@ -879,76 +799,6 @@ $('#quiz').addEventListener('click', e => {
   else endQuiz();
 });
 addEventListener('keydown', e => { if (e.key === 'Escape' && quiz.on) endQuiz(); });
-
-/* ── 配對：詞 ↔ 拼音，一輪六組 ── */
-const match = { pairs:[], sel:null, ok:0, x:0, rnd:0, bad:{}, busy:false };
-function startMatch(){
-  quiz.on = true;
-  document.body.classList.add('quiz');
-  $('#quizbtn').setAttribute('aria-pressed', true);
-  $('#quiz').hidden = false; listRoot.hidden = true;
-  $('#qcard').hidden = true; $('#qdone').hidden = true; $('#qmatch').hidden = false;
-  if (state.masked) $('#mask').click();
-  match.rnd = 0; match.x = 0;
-  newRound();
-  scrollToQuiz();
-}
-function newRound(){
-  const p = pool();
-  if (p.length < 2){
-    $('#qmatch').hidden = true; $('#qdone').hidden = false;
-    $('#qdone').innerHTML = `<h3>此範圍沒有可測的詞</h3>
-      <p class="cap">換一個分類，或關掉「只看未熟」再試。</p>`;
-    return;
-  }
-  match.pairs = shuffle(p.slice()).slice(0, Math.min(6, p.length));
-  match.rnd++; match.ok = 0; match.sel = null; match.bad = {}; match.busy = false;
-  const cells = [];
-  match.pairs.forEach((it, i) => {
-    cells.push({k:'w', i, t:it.w.split('／')[0]});
-    cells.push({k:'p', i, t:it.p.split('／')[0]});
-  });
-  shuffle(cells);
-  $('#mgrid').innerHTML = cells.map(c =>
-    `<button class="mcell${c.k === 'p' ? ' py' : ''}" type="button" data-i="${c.i}" data-k="${c.k}">${esc(c.t)}</button>`
-  ).join('');
-  $('#mrnd').textContent = match.rnd;
-  $('#mok').textContent = 0;
-  $('#mtot').textContent = match.pairs.length;
-  $('#mx').textContent = match.x;
-  $('#mfb').textContent = ''; $('#mfb').className = 'q-fb';
-}
-$('#mgrid').addEventListener('click', e => {
-  const b = e.target.closest('.mcell');
-  if (!b || match.busy || b.classList.contains('gone')) return;
-  const a = match.sel;
-  if (!a){ match.sel = b; b.classList.add('sel'); return; }
-  if (a === b){ b.classList.remove('sel'); match.sel = null; return; }
-  if (a.dataset.k === b.dataset.k){          // 同一欄，改選這個
-    a.classList.remove('sel'); match.sel = b; b.classList.add('sel'); return;
-  }
-  if (a.dataset.i === b.dataset.i){          // 配對成功
-    a.classList.add('gone'); b.classList.add('gone'); a.classList.remove('sel');
-    match.sel = null; match.ok++;
-    $('#mok').textContent = match.ok;
-    const it = match.pairs[+a.dataset.i];
-    grade(it.w, !match.bad[a.dataset.i], false);
-    if (match.ok === match.pairs.length){
-      $('#mfb').textContent = `這一輪配完了，點錯 ${match.x} 次`;
-      $('#mfb').className = 'q-fb good';
-    }
-  } else {                                   // 配錯
-    match.x++; $('#mx').textContent = match.x;
-    match.bad[a.dataset.i] = 1; match.bad[b.dataset.i] = 1;
-    a.classList.add('err'); b.classList.add('err'); match.busy = true;
-    setTimeout(() => {
-      a.classList.remove('err', 'sel'); b.classList.remove('err');
-      match.sel = null; match.busy = false;
-    }, 420);
-  }
-});
-$('#mnext').addEventListener('click', () => { newRound(); scrollToQuiz(); });
-$('#mquit').addEventListener('click', endQuiz);
 
 /* ── 進度匯出／匯入 ── */
 function iomsg(t){ $('#iomsg').textContent = t; }
