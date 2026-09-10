@@ -133,6 +133,9 @@ hr.rule{border:0; border-top:1px solid var(--ink); margin:26px 0 0; opacity:.85}
 .tgl[aria-pressed="true"]{background:var(--indigo); border-color:var(--indigo); color:var(--surface)}
 .tgl .dot{width:6px; height:6px; background:currentColor; opacity:.45}
 .tgl[aria-pressed="true"] .dot{opacity:1}
+#quizbtn{border-color:var(--indigo); color:var(--indigo)}
+#quizbtn[aria-pressed="true"]{color:var(--surface)}
+.controls .br{display:none}
 
 /* ── 分類：下拉選單 ── */
 .pick{display:inline-flex; align-items:center; gap:7px; white-space:nowrap}
@@ -400,6 +403,16 @@ footer{
 }
 
 @media (max-width:560px){
+  /* 手機上的控制列：檢索一行、分類＋測驗一行、開關一行 */
+  .controls{padding:10px 0 9px; gap:7px}
+  .controls .br{display:block; flex:0 0 100%; height:0}
+  .search{flex:1 1 100%}
+  .search input{font-size:.9rem; padding:7px 10px 7px 30px}
+  .pick{flex:1 1 auto; min-width:0}
+  .pick-lbl{display:none}
+  .pick select{width:100%; max-width:none; font-size:.85rem; padding:6px 8px}
+  .tgl{font-size:.85rem; padding:6px 11px; gap:0}
+  .tgl .ext, .tgl .dot{display:none}
   .wrap{padding:20px 12px 70px}
   .frame-in{padding:24px 20px 34px; margin:4px}
   .controls::before{inset:0 -20px}
@@ -437,10 +450,11 @@ footer{
     <label class="pick"><span class="pick-lbl">分類</span>
       <select id="cat" aria-label="分類篩選"><option value="all">全部（251 詞）</option><option value="new">★ 最新加入（23 詞）</option><option value="due" id="optDue">◎ 今日待複習（0 詞）</option><option value="wrong" id="optWrong">✕ 錯題本（0 詞）</option><option value="0">一、時光流逝‧歲月（11 詞）</option><option value="1">二、勤學苦讀‧精進（12 詞）</option><option value="2">三、品德修養‧志節操守（26 詞）</option><option value="3">四、言語‧口業‧論辯（15 詞）</option><option value="4">五、過失‧改過‧責任（15 詞）</option><option value="5">六、負面性情‧行為（18 詞）</option><option value="6">七、戰亂‧太平‧同心（12 詞）</option><option value="7">八、佛道‧修行用語（16 詞）</option><option value="8">九、情緒‧心境（20 詞）</option><option value="9">十、困境‧艱難‧虛妄（18 詞）</option><option value="10">十一、處事智慧‧謀略（14 詞）</option><option value="11">十二、才德‧人物‧身分（7 詞）</option><option value="12">十三、景物‧器物‧意象（30 詞）</option><option value="13">十四、日常動作‧行為（20 詞）</option><option value="14">十五、字形辨析（繁體／異體）（5 詞）</option><option value="15">十六、現代常用語‧泛用詞（12 詞）</option></select>
     </label>
-    <button class="tgl" id="mask" type="button" aria-pressed="false"><span class="dot"></span>遮蔽釋義</button>
-    <button class="tgl" id="unknown" type="button" aria-pressed="false"><span class="dot"></span>只看未熟</button>
-    <button class="tgl" id="newonly" type="button" aria-pressed="false"><span class="dot"></span>只看新詞</button>
     <button class="tgl" id="quizbtn" type="button" aria-pressed="false"><span class="dot"></span>測驗</button>
+    <span class="br"></span>
+    <button class="tgl" id="mask" type="button" aria-pressed="false" title="遮蔽釋義"><span class="dot"></span>遮蔽<span class="ext">釋義</span></button>
+    <button class="tgl" id="unknown" type="button" aria-pressed="false" title="只看未熟"><span class="dot"></span><span class="ext">只看</span>未熟</button>
+    <button class="tgl" id="newonly" type="button" aria-pressed="false" title="只看新詞"><span class="dot"></span><span class="ext">只看</span>新詞</button>
     <button class="tgl" id="theme" type="button" title="切換明暗"><span class="dot"></span><span id="themetxt">暗</span></button>
 
   </div>
